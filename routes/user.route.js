@@ -5,6 +5,7 @@ import {uploadImagesMiddleware}  from "../middlewares/upload.js";
 
 
 const router = Router();
+
 // Create a new user
 router.post("/", uploadImagesMiddleware, createOrder);
 // Get all users with pagination

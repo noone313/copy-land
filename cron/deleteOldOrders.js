@@ -8,7 +8,7 @@ import s3Client from "../utils/s3Client.js";
 const deleteOldImagesFromS3 = async () => {
   try {
     const bucketName = process.env.S3_BUCKET;
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000); // عشرة أيام مضت
     let deletedCount = 0;
     let totalScanned = 0;
     let isTruncated = true;
@@ -23,7 +23,7 @@ const deleteOldImagesFromS3 = async () => {
       totalScanned += objects.length;
 
       const oldObjects = objects.filter(object => 
-        object.LastModified < oneMinuteAgo
+        object.LastModified < tenDaysAgo
       );
 
       if (oldObjects.length > 0) {
@@ -59,12 +59,12 @@ const deleteOldImagesFromS3 = async () => {
 // دالة حذف الطلبات القديمة من قاعدة البيانات
 const deleteOldOrdersFromDB = async () => {
   try {
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000); // عشرة أيام مضت
     
     const deletedCount = await Order.destroy({
       where: { 
         created_at: { 
-          [Op.lt]: oneMinuteAgo 
+          [Op.lt]: tenDaysAgo 
         } 
       },
     });
@@ -108,9 +108,8 @@ const cleanupOldResources = async () => {
   }
 };
 
-// جدولة المهمة كل دقيقة
-cron.schedule("* * * * *", () => {
+// جدولة المهمة كل يوم (كل 24 ساعة)
+cron.schedule("0 0 * * *", () => {
   cleanupOldResources()
     .catch(error => console.error('❌ فشل الجدولة:', error));
 });
-
