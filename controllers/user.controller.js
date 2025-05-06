@@ -1,6 +1,13 @@
 import { Order } from '../models/models.js';
 import jwt from 'jsonwebtoken';
 
+const get = (req, res) => {
+    try {
+      res.render('create-order'); // أو أي رد مناسب
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 
 const createOrder = async (req, res) => {
     try {
@@ -119,4 +126,4 @@ const deleteOrder = async (req, res) => {
     }
 }
 
-export { createOrder, getOrders, getOrderById, updateOrder, deleteOrder };
+export { createOrder, getOrders, getOrderById, updateOrder, deleteOrder,get};

@@ -25,9 +25,7 @@ app.use('/',home);
 
 
 startServer();
-app.listen(process.env.PORT || 10000, '0.0.0.0', () => {
-  console.log('Server is running...');
-});
+app.listen(process.env.PORT || 10000);
 
 
 

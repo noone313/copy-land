@@ -50,7 +50,7 @@ note:{
   type: DataTypes.STRING,
   allowNull:true,
   validate:{
-    len:[1,255],
+    len:[0,255],
   }
 },
 images: {

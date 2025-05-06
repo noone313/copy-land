@@ -280,6 +280,145 @@
                 font-size: 1.5rem;
             }
         }
+        .tiktok-section {
+    background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+    padding: 4rem 1rem;
+    margin-top: 5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tiktok-section::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: pulse 4s infinite;
+}
+
+.tiktok-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+}
+
+.tiktok-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    transform: perspective(1000px) rotateX(2deg);
+    transition: all 0.3s ease;
+}
+
+.tiktok-content:hover {
+    transform: perspective(1000px) rotateX(0deg);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.tiktok-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+    border-radius: 15px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0, 242, 234, 0.3);
+}
+
+.tiktok-icon svg {
+    width: 30px;
+    height: 30px;
+    color: white;
+}
+
+.tiktok-title {
+    color: #1a1a2e;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.tiktok-text {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.tiktok-btn {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tiktok-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.tiktok-btn:hover::before {
+    left: 100%;
+}
+
+.tiktok-handle {
+    font-family: 'Courier New', monospace;
+    margin-left: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.tiktok-follow {
+    margin-right: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    50% { transform: scale(1.2); opacity: 0.4; }
+    100% { transform: scale(0.8); opacity: 0.8; }
+}
+
+@media (max-width: 768px) {
+    .tiktok-title {
+        font-size: 1.8rem;
+    }
+    
+    .tiktok-text {
+        font-size: 1rem;
+    }
+    
+    .tiktok-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -296,13 +435,13 @@
 
             <div class="nav__menu">
                 <ul class="nav__list">
-                    <li class="nav__item"><a href="#" class="nav__link">الرئيسية</a></li>
+                    <li class="nav__item"><a href="/" class="nav__link">الرئيسية</a></li>
                     <li class="nav__item"><a href="#modern-section" class="nav__link">من نحن</a></li>
                 </ul>
             </div>
 
             <div class="nav__actions">
-                <a href="#" class="nav__btn">حجز طلب</a>
+                <a href="/orders/create" class="nav__btn">حجز طلب</a>
             </div>
         </nav>
     </header>
@@ -352,6 +491,28 @@
             </div>
         </section>
     </div>
+
+    <section class="tiktok-section">
+        <div class="tiktok-container">
+            <div class="tiktok-content">
+                <div class="tiktok-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-3.771-1.105l-.001-.001z"/>
+                    </svg>
+                </div>
+                <h3 class="tiktok-title">شاركنا رأيك بأعمالنا!</h3>
+                <p class="tiktok-text">تابع أحدث تصاميمنا و أعمالنا الحصرية</p>
+                <a href="https://www.tiktok.com/@kobe.land" 
+                   target="_blank" 
+                   class="tiktok-btn"
+                   onmouseover="this.style.transform='rotate(2deg) scale(1.05)'"
+                   onmouseout="this.style.transform='rotate(0deg) scale(1)'">
+                   <span class="tiktok-handle">@kobe_land</span>
+                   <span class="tiktok-follow">تابعنا الآن</span>
+                </a>
+            </div>
+        </div>
+    </section>
 
     <script>
         // إدارة القائمة المنسدلة
