@@ -1,90 +1,396 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/assets/css/styles.css">
-        <title><%= title %></title>
-    </head>
-    <body>
-        <!-- HEADER -->
-        <header class="l-header">
-            <nav class="nav bd-grid">
-                <a href="#" class="nav__logo">Kobe Land</a>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kobe Land</title>
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #0071e3;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-                <div class="nav__menu" id="nav-menu">
-                    <ul class="nav__list">
-                        <li class="nav__item"><a href="#" class="nav__link">الرئيسية</a></li>
-                        <li class="nav__item"><a href="#l-section" class="nav__link">من نحن</a></li>
-                    </ul>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background-color: #fff;
+        }
+
+        /* Header Styles */
+        .l-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .nav__logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav__list {
+            display: flex;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .nav__link {
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .nav__link:hover {
+            color: var(--secondary-color);
+        }
+
+        .nav__btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .nav__btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 113, 227, 0.3);
+        }
+
+        .nav__toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .nav__toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary-color);
+            margin: 5px 0;
+            transition: var(--transition);
+        }
+
+        /* Main Content Styles */
+        .main-container {
+            max-width: 1200px;
+            margin: 6rem auto 0;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .hero__title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .hero__description {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero__img {
+            max-width: 500px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Modern Content Section */
+        .modern-section {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4rem;
+            padding: 5rem 0;
+            margin: 4rem 0;
+        }
+
+        .modern-section__img {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .modern-section__img img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modern-section__content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .modern-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .modern-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modern-card__title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .modern-card__title i {
+            margin-left: 10px;
+            color: var(--secondary-color);
+        }
+
+        .modern-card__description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        /* Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .nav__menu {
+                width: 100%;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+                order: 3;
+            }
+
+            .nav__list {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 0;
+                text-align: center;
+            }
+
+            .nav__toggle {
+                display: block;
+            }
+
+            .nav__actions {
+                margin-left: auto;
+            }
+
+            .nav__menu.active {
+                max-height: 500px;
+            }
+
+            .nav__toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .nav__toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav__toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+
+            .hero__title {
+                font-size: 2.5rem;
+            }
+            
+            .hero__description {
+                font-size: 1.2rem;
+            }
+            
+            .modern-section {
+                flex-direction: column;
+                gap: 2rem;
+                padding: 3rem 0;
+            }
+            
+            .modern-card {
+                padding: 1.5rem;
+            }
+            
+            .modern-card__title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="l-header">
+        <nav class="nav">
+            <a href="#" class="nav__logo">Kobe Land</a>
+
+            <button class="nav__toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav__menu">
+                <ul class="nav__list">
+                    <li class="nav__item"><a href="#" class="nav__link">الرئيسية</a></li>
+                    <li class="nav__item"><a href="#modern-section" class="nav__link">من نحن</a></li>
+                </ul>
+            </div>
+
+            <div class="nav__actions">
+                <a href="#" class="nav__btn">حجز طلب</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <h1 class="hero__title">Kobe Land</h1>
+            <p class="hero__description">متجر كوبي لاند متخصص بكافة مطبوعات العظم عاج.</p>
+            <img src="assets/img/logo.jpeg" alt="Kobe Land Logo" class="hero__img">
+        </section>
+
+        <!-- MODERN CONTENT SECTION -->
+        <section id="modern-section" class="modern-section">
+            <div class="modern-section__img">
+                <img src="assets/img/OIP.jpg" alt="Kobe Land Products">
+            </div>
+            
+            <div class="modern-section__content">
+                <div class="modern-card">
+                    <h3 class="modern-card__title">
+                        <i>✓</i> إستنساخ باجات عظم عاج
+                    </h3>
+                    <p class="modern-card__description">
+                        نقدم خدمة استنساخ دقيقة بنسبة 100% مع الحفاظ على أدق التفاصيل والجودة الأصلية للباجات.
+                    </p>
                 </div>
-
-                <div class="nav__actions">
-                    <div class="nav__toggle" id="nav-toggle">
-                        <img src="assets/icons/bx-chevron-down.svg" alt="">
-                    </div>
-                    <a href="#" class="nav__btn">حجز طلب</a>
+                
+                <div class="modern-card">
+                    <h3 class="modern-card__title">
+                        <i>!</i> شروط التعامل
+                    </h3>
+                    <p class="modern-card__description">
+                        لا نتعامل مع أي طلبات تتضمن تعديل أو تغيير أو إضافة على التصاميم الأصلية. نحن نلتزم بنسخ الأصل بدقة.
+                    </p>
                 </div>
-            </nav>
-        </header>
-
-        <!-- HOME -->
-        <main class="l-main bd-grid">
-            <section class="home">
-                <div class="home__data">
-                    <h1 class="home__title">Kobe Land</h1>
-                    <p class="home__description">متجر كوبي لاند متخصص بكافة مطبوعات العظم عاج.</p>
+                
+                <div class="modern-card">
+                    <h3 class="modern-card__title">
+                        <i>♥</i> حافظ على الباج الأصلي
+                    </h3>
+                    <p class="modern-card__description">
+                        ننصح عملائنا الكرام بالاحتفاظ بالباج الأصلي لأغراض الصيانة والضمان ولضمان الجودة على المدى الطويل.
+                    </p>
                 </div>
-    
-                <div class="home__img">
-                    <!-- IMG -->
-                    <img src="assets/img/logo.jpeg" alt="" class="airpod1">
-                    
-                </div>
-    
-                <div class="home__scroll">
-                    <span class="home__scroll-text">Scroll down for more</span>
-                    <a href="#l-section"><img src="assets/icons/bx-mouse.svg" alt="" class="home__scroll-icon"></a>
-                </div>
-            </section>
+            </div>
+        </section>
+    </div>
 
-            <!-- DETAILS AIRPODS -->
-            <section class="l-section" id="l-section">
-                <div class="details">
-                    <div class="details__content">
-                        <div class="details__box">
-                            <h3 class="details__title">إستنساخ باجات عظم عاج</h3>
-                            
-                        </div>
-                        
-                        <div class="details__box">
-                            <h3 class="details__title">لا نتعامل</h3>
-                            <p class="details__description">بالتعديل<br> أو <br> التغيير <br> أو <br> الأضافة</p>
-                        </div>
-                        
-                        <div class="details__box">
-                            <h3 class="details__title">حافظ على باجك الاصلي</h3>
-                        </div>
-                    </div>
+    <script>
+        // إدارة القائمة المنسدلة
+        const navToggle = document.querySelector('.nav__toggle');
+        const navMenu = document.querySelector('.nav__menu');
 
-                    <div class="details__img">
-                        <img src="assets/img/OIP.jpg" alt="" class="airpods">
-                    </div>
-                </div>
-            </section>
-        </main>
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        });
 
-        <!-- GSAP -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js"></script>
+        // إغلاق القائمة عند النقر على رابط
+        document.querySelectorAll('.nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
 
-        <!-- TIMELINE MAX -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TimelineMax.min.js"></script>
-
-        <!-- SCROLLMAGIC -->
-        <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/plugins/animation.gsap.min.js"></script>
-        
-        <!-- MAIN -->
-        <script src="assets/js/main.js"></script>
-    </body>
+        // ظهور العناصر عند التمرير
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.modern-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease-out';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
 </html>
