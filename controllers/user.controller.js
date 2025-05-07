@@ -1,9 +1,12 @@
 import { Order } from '../models/models.js';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 
-const get = (req, res) => {
+
+const getCreateOrder = (req, res) => {
     try {
-      res.render('create-order'); // أو أي رد مناسب
+        
+      res.render('createOrder');
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -43,7 +46,6 @@ const createOrder = async (req, res) => {
             maxAge: 300 * 24 * 60 * 60 * 1000, // 300 days
         });
 
-
     
         res.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
@@ -52,26 +54,46 @@ const createOrder = async (req, res) => {
     }
     }
 
-const getOrders = async (req, res) => {
-    try {
-        const { page , limit, offset} = req.pagination;
-
-        const {count , rows} = await Order.findAndCountAll({
+    const getAllOrders = async (req, res) => {
+        try {
+          const { page, limit, offset } = req.pagination;
+          const { search, orderStatus } = req.query;
+      
+          const whereClause = {};
+          if (search) {
+            whereClause[Op.or] = [
+              { name: { [Op.iLike]: `%${search}%` } },
+              { mobile: { [Op.iLike]: `%${search}%` } },
+            ];
+          }
+          if (orderStatus) {
+            whereClause.orderStatus = orderStatus;
+          }
+      
+          const { count, rows } = await Order.findAndCountAll({
+            where: whereClause,
             limit,
             offset,
-            order:[['created_at', 'DESC']],
-            
-        });
-        res.status(200).json({
-            totalItems: count,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
-            items: rows,});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error fetching orders', error });
-    }
-}
+            order: [['created_at', 'DESC']],
+          });
+      
+          // إذا الطلب من AJAX (توقع JSON)، رجع JSON
+          if (req.headers.accept?.includes('application/json')) {
+            return res.status(200).json({
+              totalItems: count,
+              totalPages: Math.ceil(count / limit),
+              currentPage: page,
+              items: rows,
+            });
+          }
+      
+          res.render('allOrders'); 
+        } catch (error) {
+          console.error(error);
+          res.status(500).render('allOrders', { error: error.message });
+        }
+      };
+      
 
 const getOrderById = async (req, res) => {
     try {
@@ -110,6 +132,27 @@ const updateOrder = async (req, res) => {
     }
 }
 
+
+const updateOrderStatus = async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { orderStatus } = req.body;
+  
+      const order = await Order.findByPk(id);
+      if (!order) return res.status(404).json({ error: 'طلب غير موجود' });
+  
+      order.orderStatus = orderStatus;
+      await order.save();
+  
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  
+
 const deleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
@@ -126,4 +169,6 @@ const deleteOrder = async (req, res) => {
     }
 }
 
-export { createOrder, getOrders, getOrderById, updateOrder, deleteOrder,get};
+
+
+export { createOrder, getAllOrders, getOrderById, updateOrder,updateOrderStatus, deleteOrder,getCreateOrder};

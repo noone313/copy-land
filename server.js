@@ -13,7 +13,6 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
 app.use(express.static('public'));
 app.use(express.static('views'));
 app.set('view engine', 'ejs');
@@ -25,7 +24,7 @@ app.use('/',home);
 
 
 startServer();
-app.listen(process.env.PORT || 10000);
+app.listen(process.env.PORT || 10000, '0.0.0.0');
 
 
 

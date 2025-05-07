@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>حجز طلب – Kobe Land</title>
+  <!-- SweetAlert2 for alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      /* Colors */
+      --primary-color: #1D1D1F;
+      --secondary-color: #0071E3;
+      --white-color: #FFF;
+      --light-bg: #F8F9FA;
+      /* Spacing */
+      --gutter: 1.5rem;
+      --section-padding: 2rem;
+      /* Border radius & shadows */
+      --radius: 10px;
+      --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      /* Transition */
+      --transition: all .3s ease;
+    }
+
+    /* RESET & BASE */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: var(--white-color);
+      color: #333;
+      line-height: 1.6;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* BOOKING SECTION */
+    .booking-section {
+      background: var(--light-bg);
+      padding: var(--section-padding) var(--gutter);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .booking-container {
+      background: var(--white-color);
+      border-radius: calc(var(--radius) * 2);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .booking-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      padding: var(--section-padding);
+      text-align: center;
+      color: var(--white-color);
+    }
+    .booking-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .booking-header p {
+      font-size: 1rem;
+      opacity: .85;
+    }
+
+    /* FORM */
+    .booking-form {
+      padding: var(--section-padding);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gutter);
+    }
+    .form-group {
+      position: relative;
+      margin-bottom: var(--gutter);
+    }
+    .form-label {
+      display: block;
+      margin-bottom: .5rem;
+      font-weight: 500;
+      color: #555;
+    }
+    .form-control {
+      width: 100%;
+      padding: calc(var(--gutter) * .66);
+      border: 2px solid #E0E0E0;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(0,113,227,0.1);
+      outline: none;
+    }
+
+    /* Floating Labels */
+    .floating-label-group {
+      margin-top: var(--gutter);
+    }
+    .floating-label {
+      position: absolute;
+      right: var(--gutter);
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--white-color);
+      padding: 0 .25rem;
+      color: #888;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .form-control:focus + .floating-label,
+    .form-control:not(:placeholder-shown) + .floating-label {
+      top: 0;
+      font-size: .9rem;
+      color: var(--secondary-color);
+    }
+
+    /* Select */
+    .select-wrapper {
+      position: relative;
+    }
+    .select-wrapper::after {
+      content: "⌵";
+      position: absolute;
+      top: 50%;
+      left: var(--gutter);
+      transform: translateY(-50%);
+      color: var(--secondary-color);
+      pointer-events: none;
+      font-size: 1.2rem;
+    }
+    select.form-control {
+      appearance: none;
+      padding-right: calc(var(--gutter) * 1.5);
+    }
+
+    /* Phone */
+    .phone-input-group {
+      display: flex;
+      gap: .5rem;
+    }
+    .country-code {
+      background: #F1F1F1;
+      padding: calc(var(--gutter) * .66);
+      border-radius: var(--radius);
+      font-weight: 500;
+      min-width: 4rem;
+      text-align: center;
+    }
+    textarea.form-control {
+      height: 120px;
+      resize: vertical;
+    }
+
+    /* File Upload */
+    .file-section {
+      border: 2px dashed #E0E0E0;
+      border-radius: var(--radius);
+      padding: var(--section-padding);
+      transition: var(--transition);
+      position: relative;
+    }
+    .file-section:hover {
+      border-color: var(--secondary-color);
+      background: rgba(0,113,227,0.03);
+    }
+    .file-input-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      color: #555;
+      gap: .5rem;
+    }
+    .upload-icon {
+      font-size: 2.5rem;
+      color: var(--secondary-color);
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: .75rem;
+      margin-top: var(--gutter);
+    }
+    .preview-item {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: transform .3s ease;
+    }
+    .preview-item:hover {
+      transform: translateY(-3px);
+    }
+    .remove-btn {
+      position: absolute;
+      top: .5rem;
+      left: .5rem;
+      background: rgba(255,0,0,0.8);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .3s ease;
+      cursor: pointer;
+    }
+    .preview-item:hover .remove-btn {
+      opacity: 1;
+    }
+    .clear-all-btn {
+      background: #FF4444;
+      color: #fff;
+      border: none;
+      padding: .5rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-top: var(--gutter);
+      float: left;
+    }
+
+    /* Submit */
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: var(--white-color);
+      padding: calc(var(--gutter) * .75) var(--gutter);
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: block;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,113,227,0.3);
+    }
+    .submit-btn::after {
+      content: "→";
+      position: absolute;
+      left: var(--gutter);
+      transition: var(--transition);
+    }
+    .submit-btn:hover::after {
+      left: calc(var(--gutter) + .5rem);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .booking-section { padding: var(--section-padding) .75rem; }
+      .booking-container { margin: var(--gutter) .5rem; }
+      .booking-header h2 { font-size: 2rem; }
+      .form-control { padding: .75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="booking-section">
+    <div class="booking-container">
+      <div class="booking-header">
+        <h2>تعبئة نموذج الحجز</h2>
+        <p>املأ النموذج التالي وسنتواصل معك خلال 24 ساعة</p>
+      </div>
+
+      <form method="post" class="booking-form" enctype="multipart/form-data" >
+        <!-- الاسم -->
+        <div class="form-group floating-label-group">
+          <input name="name" type="text" class="form-control" id="name" placeholder=" " required>
+          <label class="floating-label" for="name">الاسم الكامل *</label>
+        </div>
+
+        <!-- الهاتف (عراقي) -->
+        <div class="form-group">
+          <label class="form-label" for="phone">رقم الهاتف *</label>
+          <div class="phone-input-group">
+            <span class="country-code">+964</span>
+            <input name="mobile" type="tel" class="form-control" id="phone"
+                   pattern="[0-9]{11}" maxlength="11" minlength="11"
+                   title="رقم الهاتف يجب أن يتكون من 11 رقمًا" required
+                   placeholder="7xxxxxxxxx" required>
+          </div>
+        </div>
+
+        <!-- المحافظات العراقية -->
+        <div class="form-group">
+          <label class="form-label" for="governorate">المحافظة *</label>
+          <div class="select-wrapper">
+            <select name="city" class="form-control" id="governorate" required>
+              <option value="" disabled selected>اختر المحافظة</option>
+              <option>بغداد</option>
+              <option>البصرة</option>
+              <option>نينوى</option>
+              <option>الأنبار</option>
+              <option>صلاح الدين</option>
+              <option>دهوك</option>
+              <option>أربيل</option>
+              <option>السليمانية</option>
+              <option>كربلاء</option>
+              <option>واسط</option>
+              <option>ذي قار</option>
+              <option>ميسان</option>
+              <option>المثنى</option>
+              <option>بابل</option>
+              <option>النجف</option>
+              <option>ديالى</option>
+              <option>كركوك</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- أقرب نقطة دالة -->
+        <div class="form-group floating-label-group">
+          <input name="nearestPoint" type="text" class="form-control" id="landmark" placeholder=" " required>
+          <label class="floating-label" for="landmark">أقرب نقطة دالة *</label>
+        </div>
+
+        <!-- ملاحظات -->
+        <div class="form-group">
+          <label class="form-label" for="notes">ملاحظات إضافية (اختياري)</label>
+          <textarea name="note" class="form-control" id="notes" placeholder="أي تفاصيل إضافية تريد إضافتها..."></textarea>
+        </div>
+
+        <!-- رفع الصور -->
+        <div class="form-group">
+          <label class="form-label">رفع الصور (غير محدود)</label>
+          <div class="file-section" id="drop-zone">
+            <input name="images" type="file" id="file-input" multiple accept="image/*" hidden>
+            <label for="file-input" class="file-input-label">
+              <div class="upload-icon">📤</div>
+              <span>اسحب وأفلت الصور أو انقر للاختيار</span>
+            </label>
+            <div class="preview-grid" id="preview-container"></div>
+            <button type="button" class="clear-all-btn" onclick="clearAllFiles()">حذف الكل</button>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">إرسال الطلب</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+     document.querySelector('.booking-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // هذا يكفي لجمع كل الملفات المسماة "images" من input
+    const formData = new FormData(this);
+
+
+    try {
+      const response = await fetch('/orders', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'تم بنجاح!',
+          text: 'تم استلام طلبك بنجاح',
+          confirmButtonText: 'حسناً'
+        });
+        this.reset();
+        clearAllFiles();
+      } else {
+        throw new Error('فشل في الإرسال');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ!',
+        text: 'حدث خطأ أثناء الإرسال: ' + error.message,
+        confirmButtonText: 'حسناً'
+      });
+    }
+
+    Swal.fire({
+        icon: 'success',
+        title: 'تم استلام طلبك!',
+        text: 'سنقوم بالتواصل معك خلال 24 ساعة',
+        confirmButtonText: 'حسناً'
+      });
+      const btn = this.querySelector('.submit-btn');
+      btn.style.transform = 'scale(0.95)';
+      setTimeout(() => btn.style.transform = 'scale(1)', 200);
+      
+  });
+  
+   
+
+    // File upload logic
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('preview-container');
+    let filesArray = [];
+
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.style.borderColor = 'var(--secondary-color)';
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#E0E0E0';
+    });
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#E0E0E0';
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    function handleFiles(files) {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        filesArray.push(file);
+        previewFile(file);
+      }
+    }
+    function previewFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const idx = filesArray.indexOf(file);
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+        item.innerHTML = `
+          <img src="${e.target.result}" class="preview-image">
+          <button type="button" class="remove-btn" onclick="removeFile(${idx})">×</button>
+        `;
+        previewContainer.appendChild(item);
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeFile(i) {
+      filesArray.splice(i,1);
+      previewContainer.children[i].remove();
+      updateRemoveBtns();
+    }
+    function clearAllFiles() {
+      filesArray = [];
+      previewContainer.innerHTML = '';
+    }
+    function updateRemoveBtns() {
+      document.querySelectorAll('.remove-btn').forEach((btn, i) => {
+        btn.setAttribute('onclick', `removeFile(${i})`);
+      });
+    }
+  </script>
+</body>
+</html>
