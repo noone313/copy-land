@@ -267,11 +267,14 @@
         
         /* ===== Badges ===== */
         .order-status {
-          display: inline-block;
-          padding: var(--space-1) var(--space-3);
-          border-radius: 9999px;
-          font-size: var(--fs-sm);
-        }
+  padding: 0.25rem 0.75rem;  /* أقل من السابق */
+  font-size: 0.875rem;       /* حجم خط أصغر */
+  white-space: nowrap;       /* اجعل النص في سطر واحد */
+  display: inline-block;  
+  font-size: var(--fs-sm);
+  border-radius: 9999px;   
+  line-height: 1;            /* لضبط ارتفاع السطر */
+}
         .status-pending     { background: #E3F2FD; color: #1976D2; }
         .status-in_progress { background: #FFF3E0; color: #EF6C00; }
         .status-completed   { background: #E8F5E9; color: #2E7D32; }
@@ -307,6 +310,7 @@
                             <th class="text-right">العميل</th>
                             <th class="text-right">رقم الهاتف</th>
                             <th class="text-right">المحافظة</th>
+                            <th class="text-right">المنطقة</th>
                             <th class="text-right">تاريخ الطلب</th>
                             <th class="text-right">الحالة</th>
                             <th class="text-right">الإجراءات</th>
@@ -343,71 +347,93 @@
     </dialog>
 
     <script>
+
+      
         let currentPage = 1;
-        let totalPages = 1;
-        const itemsPerPage = 10;
+    const itemsPerPage = 10;
+    const cityMap   = {};  // id → name
+    const regionMap = {};  // id → name
 
-        async function loadOrders(page = 1, search = '', status = '') {
-            try {
-                const response = await fetch(`/orders?page=${page}&limit=${itemsPerPage}&search=${search}&orderStatus=${status}`, {
-  headers: {
-    'Accept': 'application/json'
-  }});                const data = await response.json();
-                
-                renderOrders(data.items);
-                renderPagination(data.totalPages, page);
-                currentPage = page;
-                totalPages = data.totalPages;
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
+    // 1) حمّل خريطة المحافظات مرة واحدة
+    async function loadCitiesMap() {
+      const res = await fetch('/api/cities');
+      const json = await res.json();
+      if (json.status) {
+        json.data.forEach(c => cityMap[c.id] = c.city_name);
+      }
+    }
+
+    // 2) حمّل خريطة المناطق لأي مجموعة من المحافظات
+    async function loadRegionsMapFor(cityIds) {
+      const ids = [...new Set(cityIds)];
+      await Promise.all(ids.map(async id => {
+        if (!regionMap[id]) {
+          const res = await fetch(`/api/regions?city_id=${id}`);
+          const json = await res.json();
+          if (json.status) {
+            json.data.forEach(r => regionMap[r.id] = r.region_name);
+          }
         }
+      }));
+    }
 
-        function renderOrders(orders) {
-            const tbody = document.getElementById('ordersBody');
-            tbody.innerHTML = orders.map(order => `
-                <tr>
-                    <td>#${order.id}</td>
-                    <td>${order.name}</td>
-                    <td>${order.mobile}</td>
-                    <td>${order.city}</td>
-                    <td>${new Date(order.created_at).toLocaleDateString()}</td>
-                    <td>
-                        <span class="order-status status-${order.orderStatus}">
-                            ${getStatusText(order.orderStatus)}
-                        </span>
-                    </td>
-                    <td>
-                        <button onclick="showOrderDetails(${order.id})" class="btn btn-ghost btn-sm">
-                            <i class="ph ph-eye"></i>
-                            التفاصيل
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+    // 3) جلب الطلبات مع التأكد من الخرائط
+    async function loadOrders(page = 1, search = '', status = '') {
+      if (!Object.keys(cityMap).length) {
+        await loadCitiesMap();
+      }
+      const res = await fetch(
+        `/orders?page=${page}&limit=${itemsPerPage}&search=${search}&orderStatus=${status}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      const data = await res.json();
+      const cityIds = data.items.map(o => o.city);
+      await loadRegionsMapFor(cityIds);
+      renderOrders(data.items);
+      renderPagination(data.totalPages, page);
+      currentPage = page;
+    }
 
-        function renderPagination(totalPages, currentPage) {
-            const pagination = document.getElementById('pagination');
-            let buttons = '';
-            
-            for (let i = 1; i <= totalPages; i++) {
-                buttons += `
-                    <button class="join-item btn ${i === currentPage ? 'btn-active' : ''}" 
-                            onclick="loadOrders(${i})">${i}</button>
-                `;
-            }
-            
-            pagination.innerHTML = buttons;
-        }
+    // 4) عرض الطلبات بالأسماء
+    function renderOrders(orders) {
+      const tbody = document.getElementById('ordersBody');
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${o.id}</td>
+          <td>${o.name}</td>
+          <td>${o.mobile}</td>
+          <td>${cityMap[o.city] || '—'}</td>
+          <td>${regionMap[o.region] || '—'}</td>
+          <td>${new Date(o.created_at).toLocaleDateString()}</td>
+          <td>
+            <span class="order-status status-${o.orderStatus}">
+              ${getStatusText(o.orderStatus)}
+            </span>
+          </td>
+          <td>
+            <button onclick="showOrderDetails(${o.id})" class="btn btn-ghost btn-sm">
+              التفاصيل
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
+    function renderPagination(total, current) {
+      const p = document.getElementById('pagination');
+      p.innerHTML = Array.from({ length: total }, (_, i) => `
+        <button class="join-item btn ${i+1===current?'btn-active':''}"
+                onclick="loadOrders(${i+1})">${i+1}</button>
+      `).join('');
+    }
   
 
-        async function showOrderDetails(orderId) {
+      async function showOrderDetails(orderId) {
   try {
     const response = await fetch(`/orders/${orderId}`);
     const order = await response.json();
 
+    // تحويل الصور كما في السابق
     const imagesHTML = order.images.map(img => {
       const isEncoded = /%[0-9A-Fa-f]{2}/.test(img);
       let finalSrc = isEncoded ? decodeURIComponent(img) : encodeURI(img);
@@ -420,6 +446,10 @@
         </div>
       `;
     }).join('');
+
+    // هنا نستخدم الخرائط لعرض الأسماء
+    const cityName   = cityMap[order.city]   || '—';
+    const regionName = regionMap[order.region] || '—';
 
     document.getElementById('orderDetails').innerHTML = `
       <div class="order-info-section">
@@ -434,7 +464,11 @@
         </div>
         <div class="info-group">
           <label>المحافظة:</label>
-          <p>${order.city}</p>
+          <p>${cityName}</p>
+        </div>
+        <div class="info-group">
+          <label>المنطقة:</label>
+          <p>${regionName}</p>
         </div>
         <div class="info-group">
           <label>النقطة الدالة:</label>
@@ -451,17 +485,14 @@
             <span class="order-status status-${order.orderStatus}">
               ${getStatusText(order.orderStatus)}
             </span>
-            
           </div>
-          <br>
-          <div class="update-form">
+          <div class="update-form mt-4">
             <select id="statusUpdate" class="input">
               <option value="pending" ${order.orderStatus === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
               <option value="in_progress" ${order.orderStatus === 'in_progress' ? 'selected' : ''}>قيد التنفيذ</option>
               <option value="completed" ${order.orderStatus === 'completed' ? 'selected' : ''}>مكتمل</option>
             </select>
             <button onclick="updateStatus(${order.id})" class="btn btn-primary mt-3">
-              <i class="ph ph-arrows-clockwise"></i>
               تحديث الحالة
             </button>
           </div>
@@ -481,6 +512,7 @@
     console.error('Error fetching order details:', error);
   }
 }
+
 
         async function updateStatus(orderId) {
             const newStatus = document.getElementById('statusUpdate').value;
@@ -521,6 +553,14 @@
             loadOrders(1, document.getElementById('search').value, e.target.value);
         });
 
+          // Event listeners
+    document.getElementById('search').addEventListener('input', e =>
+      loadOrders(1, e.target.value, document.getElementById('statusFilter').value)
+    );
+    document.getElementById('statusFilter').addEventListener('change', e =>
+      loadOrders(1, document.getElementById('search').value, e.target.value)
+    );
+    
         // Initial Load
         loadOrders();
 
