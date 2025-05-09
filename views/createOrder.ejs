@@ -440,15 +440,21 @@
 
         <!-- الهاتف (عراقي) -->
         <div class="form-group">
-          <label class="form-label" for="phone">رقم الهاتف *</label>
-          <div class="phone-input-group">
-            <span class="country-code">+964</span>
-            <input name="mobile" type="tel" class="form-control" id="phone"
-                   pattern="[0-9]{11}" maxlength="11" minlength="11"
-                   title="رقم الهاتف يجب أن يتكون من 11 رقمًا" required
-                   placeholder="7xxxxxxxxx" required>
-          </div>
-        </div>
+    <label class="form-label"  for="phone">رقم هاتف العميل *</label>
+    <div class="phone-input-group">
+        <span class= "country-code">+964</span>
+        <input name="mobile" 
+               type="tel" 
+               class="form-control" 
+               pattern="[0-9]{10}" 
+               maxlength="10" 
+               minlength="10"
+               title="يجب إدخال 10 أرقام بدون المقدمة الدولية"
+               placeholder="7xxxxxxxxx" 
+               required
+               style="border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 0;">
+    </div>
+</div>
 
          <!-- المحافظة -->
         <div class="form-group">

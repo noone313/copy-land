@@ -29,7 +29,7 @@ mobile:{
   allowNull:false,
   validate:{
     isNumeric:true,
-    len:[11,11],
+    len:[10,10],
   }
 },
 city:{

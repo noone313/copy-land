@@ -278,6 +278,63 @@
         .status-pending     { background: #E3F2FD; color: #1976D2; }
         .status-in_progress { background: #FFF3E0; color: #EF6C00; }
         .status-completed   { background: #E8F5E9; color: #2E7D32; }
+
+        /* تنسيقات الفورم */
+.form-control .label {
+    font-size: var(--fs-sm);
+    color: var(--gray-800);
+    padding: var(--space-1) 0;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 100px;
+    width: 100%;
+    padding: var(--space-2);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+}
+
+/* تنسيق عنصر السيليكت */
+#package_size {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-md);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none; /* إزالة المظهر الافتراضي */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232D3748' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.2em;
+}
+
+/* تأثيرات الهاڤر والفوكوس */
+#package_size:hover {
+  border-color: var(--primary);
+}
+
+#package_size:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+/* تنسيق الخيارات */
+#package_size option {
+  padding: var(--space-2);
+  background: var(--white);
+}
+
+/* تحسينات للعرض على الأجهزة المحمولة */
+@media (max-width: 768px) {
+  #package_size {
+    font-size: var(--fs-sm);
+  }
+}
         </style>
         
 </head>
@@ -311,8 +368,8 @@
                             <th class="text-right">رقم الهاتف</th>
                             <th class="text-right">المحافظة</th>
                             <th class="text-right">المنطقة</th>
-                            <th class="text-right">تاريخ الطلب</th>
                             <th class="text-right">الحالة</th>
+                            <th class="text-right">إرسال الى الوسيط</th>
                             <th class="text-right">الإجراءات</th>
                         </tr>
                     </thead>
@@ -345,6 +402,45 @@
             </div>
         </div>
     </dialog>
+
+    
+<!-- Send Form Modal -->
+<dialog id="sendModal" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <h3 class="font-bold text-lg">إرسال الطلب إلى الوسيط</h3>
+        <form action="/orders/sendToWaseet" method="post" id="sendForm" class="py-4">
+            <input type="hidden" name="orderid" id="sendOrderId">
+            
+            <div class="grid grid-cols-1 gap-3">
+                <div class="form-control">
+                    <label class="label">* عدد المواد</label>
+                    <input name="items_number" type="text" class="input input-bordered" required>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">السعر مع التوصيل *</label>
+                    <input name="price" type="tel" class="input input-bordered" required>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">حجم الطلبية</label>
+                    <select name="package_size" id="package_size">
+                        <option value="1">عادي</option>
+                        <option value="2">متوسط</option>
+                        <option value="3">كبير</option>
+                        <option value="4">كبير جداً</option>
+                    </select>                
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('sendModal').close()" 
+                        class="btn btn-ghost">إلغاء</button>
+                <button type="submit" class="btn btn-primary">إرسال</button>
+            </div>
+        </form>
+    </div>
+</dialog>
 
     <script>
 
@@ -404,11 +500,16 @@
           <td>${o.mobile}</td>
           <td>${cityMap[o.city] || '—'}</td>
           <td>${regionMap[o.region] || '—'}</td>
-          <td>${new Date(o.created_at).toLocaleDateString()}</td>
+         
           <td>
             <span class="order-status status-${o.orderStatus}">
               ${getStatusText(o.orderStatus)}
             </span>
+          </td>
+           <td>
+            <button onclick="showSendForm(${o.id})" class="btn btn-ghost btn-sm">
+    إرسال
+</button>
           </td>
           <td>
             <button onclick="showOrderDetails(${o.id})" class="btn btn-ghost btn-sm">
@@ -514,6 +615,91 @@
 }
 
 
+  async function showOrderDetails(orderId) {
+  try {
+    const response = await fetch(`/orders/${orderId}`);
+    const order = await response.json();
+
+    // تحويل الصور كما في السابق
+    const imagesHTML = order.images.map(img => {
+      const isEncoded = /%[0-9A-Fa-f]{2}/.test(img);
+      let finalSrc = isEncoded ? decodeURIComponent(img) : encodeURI(img);
+      finalSrc = finalSrc.replace(/%25([0-9A-Fa-f]{2})/g, '%$1');
+      return `
+        <div class="image-item">
+          <img src="${finalSrc}" 
+               alt="صورة الطلب"
+               onerror="this.src='/placeholder-image.png'">
+        </div>
+      `;
+    }).join('');
+
+    // هنا نستخدم الخرائط لعرض الأسماء
+    const cityName   = cityMap[order.city]   || '—';
+    const regionName = regionMap[order.region] || '—';
+
+    document.getElementById('orderDetails').innerHTML = `
+      <div class="order-info-section">
+        <h4>معلومات العميل</h4>
+        <div class="info-group">
+          <label>الاسم الكامل:</label>
+          <p>${order.name}</p>
+        </div>
+        <div class="info-group">
+          <label>رقم الجوال:</label>
+          <p>${order.mobile}</p>
+        </div>
+        <div class="info-group">
+          <label>المحافظة:</label>
+          <p>${cityName}</p>
+        </div>
+        <div class="info-group">
+          <label>المنطقة:</label>
+          <p>${regionName}</p>
+        </div>
+        <div class="info-group">
+          <label>النقطة الدالة:</label>
+          <p>${order.nearestPoint}</p>
+        </div>
+        <div class="info-group">
+          <label>ملاحظات:</label>
+          <p>${order.note || 'لا توجد ملاحظات'}</p>
+        </div>
+        
+        <div class="status-update-section">
+          <h4>حالة الطلب</h4>
+          <div class="current-status">
+            <span class="order-status status-${order.orderStatus}">
+              ${getStatusText(order.orderStatus)}
+            </span>
+          </div>
+          <div class="update-form mt-4">
+            <select id="statusUpdate" class="input">
+              <option value="pending" ${order.orderStatus === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
+              <option value="in_progress" ${order.orderStatus === 'in_progress' ? 'selected' : ''}>قيد التنفيذ</option>
+              <option value="completed" ${order.orderStatus === 'completed' ? 'selected' : ''}>مكتمل</option>
+            </select>
+            <button onclick="updateStatus(${order.id})" class="btn btn-primary mt-3">
+              تحديث الحالة
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="images-section">
+        <h4>الصور المرفوعة (${order.images.length})</h4>
+        <div class="images-container">
+          ${imagesHTML}
+        </div>
+      </div>
+    `;
+
+    document.getElementById('orderModal').showModal();
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+  }
+}
+        // Update order status
         async function updateStatus(orderId) {
             const newStatus = document.getElementById('statusUpdate').value;
             
@@ -561,6 +747,56 @@
       loadOrders(1, document.getElementById('search').value, e.target.value)
     );
     
+
+    // عرض فورم الإرسال
+function showSendForm(orderId) {
+    document.getElementById('sendOrderId').value = orderId;
+    document.getElementById('sendModal').showModal();
+}
+
+document.getElementById('sendForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإرسال...';
+        
+        // إنشاء FormData من النموذج
+        const formData = new FormData(form);
+        
+        // تحويل FormData إلى كائن JSON
+        const formDataObj = {};
+        formData.forEach((value, key) => formDataObj[key] = value);
+        
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // تحديد أننا نرسل JSON
+            },
+            body: JSON.stringify(formDataObj) // تحويل البيانات إلى JSON
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(result.message || 'تم الإرسال بنجاح');
+            document.getElementById('sendModal').close();
+            form.reset();
+        } else {
+            throw new Error(result.message || 'فشل في الإرسال');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'حدث خطأ أثناء الإرسال');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'إرسال';
+    }
+});
+
         // Initial Load
         loadOrders();
 

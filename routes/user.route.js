@@ -5,7 +5,8 @@ import {
   getAllOrders,
   deleteOrder,
   getCreateOrder,
-  updateOrderStatus
+  updateOrderStatus,
+  sendToWaseet
 } from "../controllers/user.controller.js";
 import {paginate} from "../middlewares/pagination.js";
 import { uploadImagesMiddleware } from "../middlewares/upload.js";
@@ -17,6 +18,7 @@ router.get("/create", getCreateOrder); // يجب أن يكون قبل المسا
 
 // باقي المسارات
 router.post("/", uploadImagesMiddleware, createOrder);
+router.post('/sendToWaseet', sendToWaseet);
 router.get('/', paginate,getAllOrders);
 router.post('/orderstatus/:id', updateOrderStatus);
 router.get("/:id", getOrderById);
