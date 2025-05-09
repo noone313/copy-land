@@ -21,10 +21,32 @@ app.set('views', 'views');
 
 app.use('/orders', router);
 app.use('/',home);
+app.get('/api/cities', async (req, res, next) => {
+  try {
+    const remote = await fetch('https://api.alwaseet-iq.net/v1/merchant/citys');
+    const text = await remote.text();
+    res.header('Content-Type', 'application/json');
+    return res.send(text);
+  } catch (err) {
+    next(err);
+  }
+});
 
+// 2. راوتر لجلب المناطق
+app.get('/api/regions', async (req, res, next) => {
+  const { city_id } = req.query;
+  try {
+    const remote = await fetch(`https://api.alwaseet-iq.net/v1/merchant/regions?city_id=${city_id}`);
+    const text = await remote.text();
+    res.header('Content-Type', 'application/json');
+    return res.send(text);
+  } catch (err) {
+    next(err);
+  }
+});
 
 startServer();
-app.listen(process.env.PORT || 10000, '0.0.0.0');
+app.listen(process.env.PORT || 10000);
 
 
 

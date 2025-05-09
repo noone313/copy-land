@@ -48,6 +48,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-top: 4rem;
     }
     .booking-container {
       background: var(--white-color);
@@ -267,6 +268,125 @@
       left: calc(var(--gutter) + .5rem);
     }
 
+    /* Header Styles */
+.l-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Nav container */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Logo */
+.nav__logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Links list */
+.nav__list {
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Individual link */
+.nav__link {
+    color: var(--text-color);
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+}
+.nav__link:hover {
+    color: var(--secondary-color);
+}
+
+/* Action button */
+.nav__btn {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+}
+.nav__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 113, 227, 0.3);
+}
+
+/* Mobile toggle button (hidden desktop) */
+.nav__toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.nav__toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 5px 0;
+    transition: var(--transition);
+}
+
+/* Responsive menu wrapper */
+.nav__menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    transition: var(--transition);
+}
+@media (max-width: 768px) {
+    .nav__toggle {
+        display: block;
+    }
+    .nav__menu {
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        order: 3;
+    }
+    .nav__list {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 0;
+        text-align: center;
+    }
+    .nav__menu.active {
+        max-height: 500px;
+    }
+    .nav__toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    .nav__toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .nav__toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+}
+
+
     /* Responsive */
     @media (max-width: 768px) {
       .booking-section { padding: var(--section-padding) .75rem; }
@@ -278,8 +398,34 @@
 </head>
 <body>
 
+  <!-- HEADER -->
+<header class="l-header">
+    <nav class="nav">
+        <a href="/" class="nav__logo">Kobe Land</a>
+
+        <button class="nav__toggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav__menu">
+            <ul class="nav__list">
+                <li class="nav__item"><a href="/" class="nav__link">الرئيسية</a></li>
+                <li class="nav__item"><a href="/#modern-section" class="nav__link">من نحن</a></li>
+            </ul>
+        </div>
+
+        
+    </nav>
+    
+</header>
+
+
   <section class="booking-section">
+    
     <div class="booking-container">
+     
       <div class="booking-header">
         <h2>تعبئة نموذج الحجز</h2>
         <p>املأ النموذج التالي وسنتواصل معك خلال 24 ساعة</p>
@@ -304,32 +450,27 @@
           </div>
         </div>
 
-        <!-- المحافظات العراقية -->
+         <!-- المحافظة -->
         <div class="form-group">
           <label class="form-label" for="governorate">المحافظة *</label>
           <div class="select-wrapper">
             <select name="city" class="form-control" id="governorate" required>
-              <option value="" disabled selected>اختر المحافظة</option>
-              <option>بغداد</option>
-              <option>البصرة</option>
-              <option>نينوى</option>
-              <option>الأنبار</option>
-              <option>صلاح الدين</option>
-              <option>دهوك</option>
-              <option>أربيل</option>
-              <option>السليمانية</option>
-              <option>كربلاء</option>
-              <option>واسط</option>
-              <option>ذي قار</option>
-              <option>ميسان</option>
-              <option>المثنى</option>
-              <option>بابل</option>
-              <option>النجف</option>
-              <option>ديالى</option>
-              <option>كركوك</option>
+              <option value="" disabled selected hidden>جاري تحميل المحافظات...</option>
             </select>
           </div>
         </div>
+
+        <!-- المنطقة -->
+        <div class="form-group">
+          <label class="form-label" for="region">المنطقة *</label>
+          <div class="select-wrapper">
+            <select name="region" class="form-control" id="region" required disabled>
+              <option value="" disabled selected hidden>اختر المحافظة أولاً</option>
+            </select>
+          </div>
+        </div>
+
+        
 
         <!-- أقرب نقطة دالة -->
         <div class="form-group floating-label-group">
@@ -363,12 +504,72 @@
   </section>
 
   <script>
+  function decodeUnicode(str) {
+      return str.replace(/\\u([\dA-F]{4})/gi,
+        (_, code) => String.fromCharCode(parseInt(code, 16)));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const governorateSelect = document.getElementById('governorate');
+      const regionSelect      = document.getElementById('region');
+
+      // 1. جلب المحافظات
+      fetch("/api/cities")
+        .then(res => res.text())          // تحويل الرد إلى نص
+        .then(text => JSON.parse(text))   // تحويل النص إلى JSON
+        .then(json => {
+          if (!json.status) throw new Error(json.msg || 'فشل في جلب المحافظات');
+          // إعادة تهيئة القائمة
+          governorateSelect.innerHTML = '<option value="" disabled selected hidden>اختر المحافظة</option>';
+          // تعبئة الخيارات
+          json.data.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value       = city.id;
+            opt.textContent = decodeUnicode(city.city_name);
+            governorateSelect.appendChild(opt);
+          });
+          // تفعيل القائمة
+          governorateSelect.disabled = false;
+        })
+        .catch(err => {
+          console.error("حدث خطأ أثناء جلب المحافظات:", err);
+          governorateSelect.innerHTML = '<option value="" disabled selected>تعذّر تحميل المحافظات</option>';
+        });
+
+      // 2. جلب المناطق عند اختيار محافظة
+      governorateSelect.addEventListener('change', () => {
+        const cityId = governorateSelect.value;
+        // إعادة تهيئة قائمة المناطق
+        regionSelect.innerHTML = '<option value="" disabled selected hidden>جاري تحميل المناطق...</option>';
+        regionSelect.disabled = true;
+
+        fetch(`/api/regions?city_id=${cityId}`)
+          .then(res => res.text())
+          .then(text => JSON.parse(text))
+          .then(json => {
+            if (!json.status) throw new Error(json.msg || 'فشل في جلب المناطق');
+            regionSelect.innerHTML = '<option value="" disabled selected hidden>اختر المنطقة</option>';
+            json.data.forEach(region => {
+              const opt = document.createElement('option');
+              opt.value       = region.id;
+              opt.textContent = decodeUnicode(region.region_name);
+              regionSelect.appendChild(opt);
+            });
+            regionSelect.disabled = false;
+          })
+          .catch(err => {
+            console.error("حدث خطأ أثناء جلب المناطق:", err);
+            regionSelect.innerHTML = '<option value="" disabled selected>تعذّر تحميل المناطق</option>';
+          });
+      });
+    });
+
+
      document.querySelector('.booking-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // هذا يكفي لجمع كل الملفات المسماة "images" من input
     const formData = new FormData(this);
-
+   
 
     try {
       const response = await fetch('/orders', {
@@ -466,6 +667,34 @@
         btn.setAttribute('onclick', `removeFile(${i})`);
       });
     }
+
+
+    // عناصر التoggle والقائمة
+const navToggle = document.querySelector('.nav__toggle');
+const navMenu   = document.querySelector('.nav__menu');
+
+// عند النقر على أيقونة التoggle
+navToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+    navToggle.classList.toggle('active');
+});
+
+// إغلاق القائمة عند النقر على أي رابط
+document.querySelectorAll('.nav__link').forEach(link => {
+    link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+    });
+});
+    // إغلاق القائمة عند النقر في أي مكان آخر
+    document.addEventListener('click', (event) => {
+        if (!navMenu.contains(event.target) && !navToggle.contains(event.target)) {
+            navMenu.classList.remove('active');
+            navToggle.classList.remove('active');
+        }
+    });
+
+
   </script>
 </body>
 </html>

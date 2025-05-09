@@ -14,7 +14,7 @@ const getCreateOrder = (req, res) => {
 
 const createOrder = async (req, res) => {
     try {
-        const {name, mobile,city, nearestPoint, note } = req.body;
+        const {name, mobile,city,region, nearestPoint, note } = req.body;
         const images = req.imageLinks;
 
     
@@ -22,6 +22,7 @@ const createOrder = async (req, res) => {
         name,
         mobile,
         city,
+        region,
         nearestPoint,
         note,
         images
@@ -109,30 +110,6 @@ const getOrderById = async (req, res) => {
     }
 }
 
-const updateOrder = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { orderStatus } = req.body;
-        
-
-    
-        const order = await Order.findByPk(id);
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-    
-        await order.update({
-            orderStatus,
-        });
-    
-        res.status(200).json({ message: 'Order updated successfully', order });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error updating order', error });
-    }
-}
-
-
 const updateOrderStatus = async (req, res) => {
     try {
       const id = req.params.id;
@@ -171,4 +148,4 @@ const deleteOrder = async (req, res) => {
 
 
 
-export { createOrder, getAllOrders, getOrderById, updateOrder,updateOrderStatus, deleteOrder,getCreateOrder};
+export { createOrder, getAllOrders, getOrderById,updateOrderStatus, deleteOrder,getCreateOrder};

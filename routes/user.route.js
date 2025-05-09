@@ -3,7 +3,6 @@ import {
   createOrder, 
   getOrderById,
   getAllOrders,
-  updateOrder,
   deleteOrder,
   getCreateOrder,
   updateOrderStatus
@@ -23,4 +22,4 @@ router.post('/orderstatus/:id', updateOrderStatus);
 router.get("/:id", getOrderById);
 router.delete("/:id", deleteOrder);
 
-export default router; 
+export default router;

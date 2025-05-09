@@ -46,6 +46,13 @@ nearestPoint:{
     len:[1,50],
   }
 },
+region:{
+  type: DataTypes.STRING,
+  allowNull:false,
+  validate:{
+    len:[1,50],
+  }
+},
 note:{
   type: DataTypes.STRING,
   allowNull:true,
