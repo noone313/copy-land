@@ -1,6 +1,11 @@
 import { Order } from '../models/models.js';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
+ import FormData from 'form-data';
+import fetch from 'node-fetch';
+import { notifyNewOrder } from './telegram-bot.js'; // تأكد من المسار الصحيح
+import dotenv from 'dotenv';    
+dotenv.config();
 
 
 const getCreateOrder = (req, res) => {
@@ -47,6 +52,16 @@ const createOrder = async (req, res) => {
             maxAge: 300 * 24 * 60 * 60 * 1000, // 300 days
         });
 
+         await notifyNewOrder({
+    id: order.id,
+    name: order.name,
+    mobile: order.mobile,
+    cityName: order.cityName,       // استخرج الاسم من الـ proxy API
+    regionName: order.regionName,   // نفس الأمر
+    note: order.note,
+    images: order.images || []
+  });
+
     
         res.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
@@ -55,8 +70,7 @@ const createOrder = async (req, res) => {
     }
     }
 
- import FormData from 'form-data';
-import fetch from 'node-fetch';
+
 
 const sendToWaseet = async (req, res) => {
     try {
