@@ -370,6 +370,7 @@
                             <th class="text-right">المنطقة</th>
                             <th class="text-right">الحالة</th>
                             <th class="text-right">إرسال الى الوسيط</th>
+                            <th class="text-right">حذف</th>
                             <th class="text-right">الإجراءات</th>
                         </tr>
                     </thead>
@@ -490,35 +491,40 @@
       currentPage = page;
     }
 
-    // 4) عرض الطلبات بالأسماء
-    function renderOrders(orders) {
-      const tbody = document.getElementById('ordersBody');
-      tbody.innerHTML = orders.map(o => `
-        <tr>
-          <td>#${o.id}</td>
-          <td>${o.name}</td>
-          <td>${o.mobile}</td>
-          <td>${cityMap[o.city] || '—'}</td>
-          <td>${regionMap[o.region] || '—'}</td>
-         
-          <td>
-            <span class="order-status status-${o.orderStatus}">
-              ${getStatusText(o.orderStatus)}
-            </span>
-          </td>
-           <td>
-            <button onclick="showSendForm(${o.id})" class="btn btn-ghost btn-sm">
-    إرسال
-</button>
-          </td>
-          <td>
-            <button onclick="showOrderDetails(${o.id})" class="btn btn-ghost btn-sm">
-              التفاصيل
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
+  function renderOrders(orders) {
+  const tbody = document.getElementById('ordersBody');
+  tbody.innerHTML = orders.map(o => `
+    <tr>
+      <td>#${o.id}</td>
+      <td>${o.name}</td>
+      <td>${o.mobile}</td>
+      <td>${cityMap[o.city] || '—'}</td>
+      <td>${regionMap[o.region] || '—'}</td>
+      <td>
+        <span class="order-status status-${o.orderStatus}">
+          ${getStatusText(o.orderStatus)}
+        </span>
+      </td>
+      <td>
+        <button onclick="showSendForm(${o.id})" class="btn btn-ghost btn-sm">
+          إرسال
+        </button>
+      </td>
+      <td>
+        <button onclick="deleteOrder(${o.id})" class="btn btn-sm btn-ghost" style="color:#E53E3E;">
+          حذف
+        </button>
+      </td>
+      <td>
+        <button onclick="showOrderDetails(${o.id})" class="btn btn-ghost btn-sm">
+          التفاصيل
+        </button>
+      </td>
+      
+    </tr>
+  `).join('');
+}
+
 
     function renderPagination(total, current) {
       const p = document.getElementById('pagination');
@@ -796,6 +802,22 @@ document.getElementById('sendForm').addEventListener('submit', async function(e)
         submitBtn.textContent = 'إرسال';
     }
 });
+
+
+async function deleteOrder(orderId) {
+  if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+  try {
+    const res = await fetch(`/orders/${orderId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('فشل في حذف الطلب');
+    // بعد الحذف، أعد تحميل الصفحة أو بيانات الجدول
+    loadOrders(currentPage, document.getElementById('search').value, document.getElementById('statusFilter').value);
+  } catch (err) {
+    console.error(err);
+    alert(err.message || 'حدث خطأ أثناء الحذف');
+  }
+}
 
         // Initial Load
         loadOrders();
