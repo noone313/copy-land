@@ -571,51 +571,47 @@
     });
 
 
-     document.querySelector('.booking-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
+    document.querySelector('.booking-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-    const formData = new FormData(this);
-   
+  const form = this;
+  const btn = form.querySelector('.submit-btn');
+  btn.disabled = true; // تعطيل الزر لتجنب الإرسال المتكرر
 
-    try {
-      const response = await fetch('/orders', {
-        method: 'POST',
-        body: formData
-      });
+  const formData = new FormData(form);
 
-      if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'تم بنجاح!',
-          text: 'تم استلام طلبك بنجاح',
-          confirmButtonText: 'حسناً'
-        });
-        this.reset();
-        clearAllFiles();
-      } else {
-        throw new Error('فشل في الإرسال');
-      }
-    } catch (error) {
+  try {
+    const response = await fetch('/orders', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
       Swal.fire({
-        icon: 'error',
-        title: 'خطأ!',
-        text: 'حدث خطأ أثناء الإرسال: ' + error.message,
-        confirmButtonText: 'حسناً'
-      });
-    }
-
-    Swal.fire({
         icon: 'success',
-        title: 'تم استلام طلبك!',
-        text: 'سنقوم بالتواصل معك خلال 24 ساعة',
+        title: 'تم بنجاح!',
+        text: 'تم استلام طلبك بنجاح، سنقوم بالتواصل معك خلال 24 ساعة',
         confirmButtonText: 'حسناً'
       });
-      const btn = this.querySelector('.submit-btn');
-      btn.style.transform = 'scale(0.95)';
-      setTimeout(() => btn.style.transform = 'scale(1)', 200);
-      
-  });
-  
+      form.reset();
+      clearAllFiles();
+    } else {
+      throw new Error('فشل في الإرسال');
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'خطأ!',
+      text: 'حدث خطأ أثناء الإرسال: ' + error.message,
+      confirmButtonText: 'حسناً'
+    });
+  } finally {
+    btn.disabled = false; // إعادة تفعيل الزر بعد انتهاء العملية
+    btn.style.transform = 'scale(0.95)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 200);
+  }
+});
+
    
 
     // File upload logic
