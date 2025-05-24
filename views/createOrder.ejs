@@ -467,14 +467,23 @@
         </div>
 
         <!-- المنطقة -->
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label class="form-label" for="region">المنطقة *</label>
           <div class="select-wrapper">
             <select name="region" class="form-control" id="region" required disabled>
               <option value="" disabled selected hidden>اختر المحافظة أولاً</option>
             </select>
           </div>
-        </div>
+        </div> -->
+
+
+<!-- المنطقة -->
+<div class="form-group">
+  <label class="form-label" for="region-input">المنطقة *</label>
+  <input name="region" id="region-input" class="form-control" list="region-options" placeholder="ابحث عن المنطقة" required disabled>
+  <datalist id="region-options"></datalist>
+</div>
+
 
         
 
@@ -544,31 +553,33 @@
         });
 
       // 2. جلب المناطق عند اختيار محافظة
-      governorateSelect.addEventListener('change', () => {
-        const cityId = governorateSelect.value;
-        // إعادة تهيئة قائمة المناطق
-        regionSelect.innerHTML = '<option value="" disabled selected hidden>جاري تحميل المناطق...</option>';
-        regionSelect.disabled = true;
+      const regionInput = document.getElementById('region-input');
+const regionOptions = document.getElementById('region-options');
 
-        fetch(`/api/regions?city_id=${cityId}`)
-          .then(res => res.text())
-          .then(text => JSON.parse(text))
-          .then(json => {
-            if (!json.status) throw new Error(json.msg || 'فشل في جلب المناطق');
-            regionSelect.innerHTML = '<option value="" disabled selected hidden>اختر المنطقة</option>';
-            json.data.forEach(region => {
-              const opt = document.createElement('option');
-              opt.value       = region.id;
-              opt.textContent = decodeUnicode(region.region_name);
-              regionSelect.appendChild(opt);
-            });
-            regionSelect.disabled = false;
-          })
-          .catch(err => {
-            console.error("حدث خطأ أثناء جلب المناطق:", err);
-            regionSelect.innerHTML = '<option value="" disabled selected>تعذّر تحميل المناطق</option>';
-          });
+governorateSelect.addEventListener('change', () => {
+  const cityId = governorateSelect.value;
+  regionInput.disabled = true;
+  regionInput.value = '';
+  regionOptions.innerHTML = '';
+
+  fetch(`/api/regions?city_id=${cityId}`)
+    .then(res => res.text())
+    .then(text => JSON.parse(text))
+    .then(json => {
+      if (!json.status) throw new Error(json.msg || 'فشل في جلب المناطق');
+      regionOptions.innerHTML = ''; // تفريغ القائمة القديمة
+      json.data.forEach(region => {
+        const opt = document.createElement('option');
+        opt.value = decodeUnicode(region.region_name); // استخدم الاسم
+        regionOptions.appendChild(opt);
       });
+      regionInput.disabled = false;
+    })
+    .catch(err => {
+      console.error("حدث خطأ أثناء جلب المناطق:", err);
+      regionOptions.innerHTML = '';
+    });
+});
     });
 
 
