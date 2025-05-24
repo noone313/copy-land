@@ -355,6 +355,50 @@
     gap: 2rem;
     transition: var(--transition);
 }
+/* CSS */
+.custom-dropdown {
+  position: relative;
+}
+
+.dropdown-input {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+  display: none;
+}
+
+.dropdown-options.active {
+  display: block;
+}
+
+.option-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.option-item:hover {
+  background: #f5f5f5;
+}
+
+.no-results {
+  padding: 10px;
+  color: #666;
+  text-align: center;
+}
 @media (max-width: 768px) {
     .nav__toggle {
         display: block;
@@ -466,22 +510,20 @@
           </div>
         </div>
 
-        <!-- المنطقة -->
-        <!-- <div class="form-group">
-          <label class="form-label" for="region"> المنطقة ( اقتراحات المناطق موجودة في الكيبورد اختار منها ) *</label>
-          <div class="select-wrapper">
-            <select name="region" class="form-control" id="region" required disabled>
-              <option value="" disabled selected hidden>اختر المحافظة أولاً</option>
-            </select>
-          </div>
-        </div> -->
-
-
-<!-- المنطقة -->
+       <!-- HTML -->
 <div class="form-group">
-  <label class="form-label" for="region-input">المنطقة ( اقتراحات المناطق موجودة في الكيبورد اختار منها )*</label>
-  <input name="region" id="region-input" class="form-control" list="region-options" placeholder="ابحث عن المنطقة" required disabled>
-  <datalist id="region-options"></datalist>
+  <label class="form-label" for="region-input">المنطقة *</label>
+  <div class="custom-dropdown">
+    <input 
+      type="text" 
+      id="region-input" 
+      class="form-control dropdown-input" 
+      placeholder="ابحث عن المنطقة..."
+      autocomplete="off"
+      disabled
+    >
+    <div class="dropdown-options" id="region-options"></div>
+  </div>
 </div>
 
 
@@ -552,35 +594,78 @@
           governorateSelect.innerHTML = '<option value="" disabled selected>تعذّر تحميل المحافظات</option>';
         });
 
-      // 2. جلب المناطق عند اختيار محافظة
-      const regionInput = document.getElementById('region-input');
+      // JavaScript
+const regionInput = document.getElementById('region-input');
 const regionOptions = document.getElementById('region-options');
+let allRegions = [];
 
-governorateSelect.addEventListener('change', () => {
+// عند تغيير المحافظة
+governorateSelect.addEventListener('change', async () => {
   const cityId = governorateSelect.value;
   regionInput.disabled = true;
   regionInput.value = '';
   regionOptions.innerHTML = '';
 
-  fetch(`/api/regions?city_id=${cityId}`)
-    .then(res => res.text())
-    .then(text => JSON.parse(text))
-    .then(json => {
-      if (!json.status) throw new Error(json.msg || 'فشل في جلب المناطق');
-      regionOptions.innerHTML = ''; // تفريغ القائمة القديمة
-      json.data.forEach(region => {
-        const opt = document.createElement('option');
-        opt.value = decodeUnicode(region.region_name); // استخدم الاسم
-        regionOptions.appendChild(opt);
-      });
+  try {
+    const response = await fetch(`/api/regions?city_id=${cityId}`);
+    const data = await response.json();
+    
+    if (data.status) {
+      allRegions = data.data.map(region => decodeUnicode(region.region_name));
       regionInput.disabled = false;
-    })
-    .catch(err => {
-      console.error("حدث خطأ أثناء جلب المناطق:", err);
-      regionOptions.innerHTML = '';
-    });
+      setupDropdown();
+    }
+  } catch (error) {
+    console.error('Error loading regions:', error);
+  }
 });
+
+function setupDropdown() {
+  regionInput.addEventListener('focus', () => {
+    showDropdown(allRegions);
+  });
+
+  regionInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filtered = allRegions.filter(region => 
+      region.toLowerCase().includes(searchTerm)
+    );
+    showDropdown(filtered);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-dropdown')) {
+      regionOptions.classList.remove('active');
+    }
+  });
+}
+
+function showDropdown(options) {
+  if (options.length === 0) {
+    regionOptions.innerHTML = `<div class="no-results">لا توجد نتائج</div>`;
+    regionOptions.classList.add('active');
+    return;
+  }
+
+  regionOptions.innerHTML = options
+    .map(region => `
+      <div class="option-item" data-value="${region}">
+        ${region}
+      </div>
+    `).join('');
+
+  regionOptions.querySelectorAll('.option-item').forEach(item => {
+    item.addEventListener('click', () => {
+      regionInput.value = item.dataset.value;
+      regionOptions.classList.remove('active');
     });
+  });
+
+  regionOptions.classList.add('active');
+}
+      });
+
+    // ✅ إضافة حدث عند إرسال النموذج
 
 
 
