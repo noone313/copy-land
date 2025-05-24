@@ -99,7 +99,7 @@ const sendToWaseet = async (req, res) => {
         if (clientMobile.length !== 10 || !/^[0-9]{10}$/.test(clientMobile)) {
             return res.status(400).json({
                 success: false,
-                message: 'رقم الهاتف يجب أن يتكون من 10 أرقام بدون كود الدولة',
+                message: 'رقم الهاتف يجب أن يتكون من 11 أرقام بدون كود الدولة',
                 provided_mobile: order.mobile
             });
         }

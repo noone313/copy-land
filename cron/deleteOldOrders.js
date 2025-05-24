@@ -8,7 +8,7 @@ import s3Client from "../utils/s3Client.js";
 const deleteOldImagesFromS3 = async () => {
   try {
     const bucketName = process.env.S3_BUCKET;
-    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000); // عشرة أيام مضت
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
     let deletedCount = 0;
     let totalScanned = 0;
     let isTruncated = true;
