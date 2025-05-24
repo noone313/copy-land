@@ -492,7 +492,7 @@
 
         <!-- رفع الصور -->
         <div class="form-group">
-          <label class="form-label">رفع الصور (غير محدود)</label>
+          <label class="form-label">رفع الصور (صورتين من الجهتين الامام و الخلف )</label>
           <div class="file-section" id="drop-zone">
             <input name="images" type="file" id="file-input" multiple accept="image/*" hidden>
             <label for="file-input" class="file-input-label">
@@ -510,6 +510,7 @@
   </section>
 
   <script>
+     
   function decodeUnicode(str) {
       return str.replace(/\\u([\dA-F]{4})/gi,
         (_, code) => String.fromCharCode(parseInt(code, 16)));
@@ -571,13 +572,25 @@
     });
 
 
-    document.querySelector('.booking-form').addEventListener('submit', async function(e) {
+
+  document.querySelector('.booking-form').addEventListener('submit', async function(e) {
   e.preventDefault();
 
   const form = this;
   const btn = form.querySelector('.submit-btn');
-  btn.disabled = true; // تعطيل الزر لتجنب الإرسال المتكرر
+  const files = document.getElementById("file-input").files;
 
+  // ✅ التحقق أولاً من الصور
+  if (files.length < 2) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'الصور مطلوبة',
+      text: 'الرجاء رفع صورتين على الأقل قبل إرسال الطلب.'
+    });
+    return; // ❌ لا يتم إرسال البيانات إطلاقاً
+  }
+
+  btn.disabled = true; // تعطيل الزر لتجنب التكرار
   const formData = new FormData(form);
 
   try {
@@ -606,11 +619,12 @@
       confirmButtonText: 'حسناً'
     });
   } finally {
-    btn.disabled = false; // إعادة تفعيل الزر بعد انتهاء العملية
+    btn.disabled = false;
     btn.style.transform = 'scale(0.95)';
     setTimeout(() => btn.style.transform = 'scale(1)', 200);
   }
 });
+
 
    
 
