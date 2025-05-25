@@ -510,19 +510,20 @@
           </div>
         </div>
 
-       <!-- HTML -->
+     <!-- في جزء المنطقة -->
 <div class="form-group">
   <label class="form-label" for="region-input">المنطقة *</label>
   <div class="custom-dropdown">
     <input 
       type="text" 
-      name="region"
       id="region-input" 
       class="form-control dropdown-input" 
       placeholder="ابحث عن المنطقة..."
       autocomplete="off"
       disabled
+      required
     >
+    <input type="hidden" name="region" id="region-id"> <!-- الحقل المخفي للقيمة الفعلية -->
     <div class="dropdown-options" id="region-options"></div>
   </div>
 </div>
@@ -605,35 +606,46 @@ governorateSelect.addEventListener('change', async () => {
   const cityId = governorateSelect.value;
   regionInput.disabled = true;
   regionInput.value = '';
-  regionOptions.innerHTML = '';
+  document.getElementById('region-id').value = ''; // إفراغ الحقل المخفي
 
   try {
     const response = await fetch(`/api/regions?city_id=${cityId}`);
     const data = await response.json();
     
     if (data.status) {
-      allRegions = data.data.map(region => decodeUnicode(region.region_name));
-      regionInput.disabled = false;
-      setupDropdown();
+    allRegions = data.data.map(region => ({
+      id: region.id,
+      name: decodeUnicode(region.region_name)
+    }));
+    regionInput.disabled = false;
+    setupDropdown(); // ← هذا السطر ضروري
+  } else {
+      throw new Error(data.msg || 'فشل في جلب المناطق');
     }
+    
+    // إظهار القائمة
+    showDropdown(allRegions);
   } catch (error) {
     console.error('Error loading regions:', error);
   }
 });
 
 function setupDropdown() {
-  regionInput.addEventListener('focus', () => {
+  // إظهار القائمة عند النقر
+  regionInput.addEventListener('click', () => {
     showDropdown(allRegions);
   });
 
+  // البحث أثناء الكتابة
   regionInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const filtered = allRegions.filter(region => 
-      region.toLowerCase().includes(searchTerm)
+      region.name.toLowerCase().includes(searchTerm)
     );
     showDropdown(filtered);
   });
 
+  // إخفاء القائمة عند النقر خارجها
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown')) {
       regionOptions.classList.remove('active');
@@ -642,26 +654,31 @@ function setupDropdown() {
 }
 
 function showDropdown(options) {
+  regionOptions.innerHTML = '';
+  
   if (options.length === 0) {
-    regionOptions.innerHTML = `<div class="no-results">لا توجد نتائج</div>`;
-    regionOptions.classList.add('active');
-    return;
-  }
-
-  regionOptions.innerHTML = options
-    .map(region => `
-      <div class="option-item" data-value="${region}">
-        ${region}
-      </div>
-    `).join('');
-
-  regionOptions.querySelectorAll('.option-item').forEach(item => {
-    item.addEventListener('click', () => {
-      regionInput.value = item.dataset.value;
-      regionOptions.classList.remove('active');
+    const noResults = document.createElement('div');
+    noResults.className = 'no-results';
+    noResults.textContent = 'لا توجد نتائج';
+    regionOptions.appendChild(noResults);
+  } else {
+    options.forEach(region => {
+      const option = document.createElement('div');
+      option.className = 'option-item';
+      option.textContent = region.name;
+      option.dataset.id = region.id;
+      option.dataset.name = region.name;
+      
+      option.addEventListener('click', () => {
+        regionInput.value = region.name;
+        document.getElementById('region-id').value = region.id;
+        regionOptions.classList.remove('active');
+      });
+      
+      regionOptions.appendChild(option);
     });
-  });
-
+  }
+  
   regionOptions.classList.add('active');
 }
       });
@@ -684,6 +701,16 @@ function showDropdown(options) {
       text: 'الرجاء رفع صورتين على الأقل قبل إرسال الطلب.'
     });
     return; // ❌ لا يتم إرسال البيانات إطلاقاً
+  }
+
+  const regionId = document.getElementById('region-id').value;
+  if (!regionId) {
+    Swal.fire({
+      icon: 'error',
+      title: 'حقل مطلوب',
+      text: 'الرجاء اختيار المنطقة من القائمة'
+    });
+    return;
   }
 
   btn.disabled = true; // تعطيل الزر لتجنب التكرار
