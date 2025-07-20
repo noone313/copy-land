@@ -819,8 +819,24 @@ async function deleteOrder(orderId) {
   }
 }
 
-        // Initial Load
-        loadOrders();
+      // رمز الدخول المطلوب
+const PASSWORD = "aedf143@@@"; // غيّر الرمز هنا
+
+function askPassword() {
+  const input = prompt("يرجى إدخال رمز الدخول للوحة التحكم:");
+  if (input === PASSWORD) {
+    // تم الدخول بنجاح، استمر بعرض المحتوى
+    loadOrders(); // تبدأ تحميل البيانات بعد التحقق
+  } else {
+    alert("رمز خاطئ! سيتم إعادة المحاولة.");
+    askPassword(); // اطلب الرمز مرة أخرى
+  }
+}
+
+// منع تحميل البيانات قبل التحقق
+// استدعاء الطلب الأول فقط بعد نجاح إدخال الرمز
+askPassword();
+
 
     </script>
 </body>
